@@ -28,7 +28,7 @@ namespace Domain.Entities
                 Message = message
             };
         }
-        public void MaskAsRead()
+        public void MarkAsRead()
         {
             IsRead = true;
         }
