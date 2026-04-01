@@ -9,15 +9,31 @@ namespace Domain.Entities
 {
     public class Booking
     {
-        public Booking() { }
+        public Booking() 
+        { 
+            // EF Core default constructor
+            Dates = new DateRange(DateTime.UtcNow, DateTime.UtcNow.AddDays(1));
+        }
         public  Guid Id { get; init; } = Guid.NewGuid();
-        public required Guid PropertyId { get; init; }
-        public required Guid GuestId { get; init; }
-
-        public required DateRange Dates { get; init; }
-        public required decimal TotalPrice { get; init; }
-
+        public Guid PropertyId { get; private set; }
+        public Guid GuestId { get; private set; }
+        public DateRange Dates { get; private set; }
+        public decimal TotalPrice { get; private set; }
         public BookingStatus Status { get; private set; } = BookingStatus.Confirmed;
+
+        public static Booking Create(Guid propertyId, Guid guestId, DateRange dates, decimal pricePerNight)
+        {
+            var totalNights = (dates.End - dates.Start).Days;
+            if (totalNights <= 0) totalNights = 1;
+            
+            return new Booking
+            {
+                PropertyId = propertyId,
+                GuestId = guestId,
+                Dates = dates,
+                TotalPrice = totalNights * pricePerNight
+            };
+        }
 
         // Concurrency Token to prevent Double-Bookings (EF Core Optimistic Concurrency)
         public byte[] RowVersion { get; private set; } = Array.Empty<byte>();

@@ -14,10 +14,21 @@ public class User
 
     // Using required and init for initialization
     public  Guid Id { get; init; } = Guid.NewGuid();
-    public required string FirstName { get; init; }
-    public required string LastName { get; init; }
-    public required string Email { get; init; }
-    public required string PasswordHash { get; init; }
+    public string FirstName { get; private set; } = string.Empty;
+    public string LastName { get; private set; } = string.Empty;
+    public string Email { get; private set; } = string.Empty;
+    public string PasswordHash { get; private set; } = string.Empty;
+
+    public static User Create(string firstName, string lastName, string email, string passwordHash)
+    {
+        return new User
+        {
+            FirstName = firstName,
+            LastName = lastName,
+            Email = email,
+            PasswordHash = passwordHash
+        };
+    }
     
     // Role is not required, defaults to Guest
     public Role Role { get; private set; } = Domain.Enums.Role.Guest; 

@@ -10,13 +10,38 @@ namespace Domain.Entities
     {
         public Property() { }
         public Guid Id { get; init; } = Guid.NewGuid();
-        public Guid HostId { get; init; }
-        public required string Title { get; init; }
-        public required string Description { get; init; }
-        public required string Location { get; init; }
+        public Guid HostId { get; private set; }
+        public string Title { get; private set; } = string.Empty;
+        public string Description { get; private set; } = string.Empty;
+        public string Location { get; private set; } = string.Empty;
 
-        public required decimal PricePerNight { get; init; }
-        public required int Capacity { get; init; }
+        public decimal PricePerNight { get; private set; }
+        public int Capacity { get; private set; }
+
+        public static Property Create(Guid hostId, string title, string description, string location, decimal pricePerNight, int capacity)
+        {
+            return new Property
+            {
+                HostId = hostId,
+                Title = title,
+                Description = description,
+                Location = location,
+                PricePerNight = pricePerNight,
+                Capacity = capacity
+            };
+        }
+
+        public void UpdateDetails(string title, string description, string location, decimal pricePerNight, int capacity)
+        {
+            if (pricePerNight <= 0) throw new ArgumentException("Price must be greater than zero.");
+            if (capacity <= 0) throw new ArgumentException("Capacity must be greater than zero.");
+
+            Title = title;
+            Description = description;
+            Location = location;
+            PricePerNight = pricePerNight;
+            Capacity = capacity;
+        }
 
 
         private readonly List<DateRange> _blockedDates = new();
