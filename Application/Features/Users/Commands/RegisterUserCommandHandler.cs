@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Domain.Interfaces;
 using MediatR;
 using Domain.Enums;
 using Domain.Entities;
+using Application.Features.Users.DTOs;
 
 namespace Application.Features.Users.Commands
 {
@@ -24,14 +21,12 @@ namespace Application.Features.Users.Commands
         {
 
             //TODO FLuent validation
-            var newUser = new User
-            {
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                Email = request.Email,
-                PasswordHash = request.Password,
-
-            };
+            var newUser = User.Create(
+                request.FirstName,
+                request.LastName,
+                request.Email,
+                request.Password
+            );
 
             if (request.IsHost)
             {
