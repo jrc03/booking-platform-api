@@ -19,13 +19,8 @@ namespace Application.Features.Properties.Commands.DeleteProperty
 
         public async Task Handle(DeletePropertyCommand request, CancellationToken cancellationToken)
         {
-            var property = await _propertyRepository.GetByIdAsync(request.Id);
+            var property = await _propertyRepository.GetByIdAsync(request.Id) ?? throw new Exception("Property not found");
             
-            if (property == null)
-            {
-                throw new Exception("Property not found");
-            }
-
             _propertyRepository.Delete(property);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             
