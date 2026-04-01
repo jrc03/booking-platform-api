@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
+using Application.Features.Properties.DTOs;
 
 namespace Application.Features.Properties.Commands
 {
@@ -21,15 +22,14 @@ namespace Application.Features.Properties.Commands
 
         public async Task<PropertyResponseDto> Handle(CreatePropertyCommand request, CancellationToken cancellationToken)
         {
-            var newProperty = new Property
-            {
-                Title = request.Title,
-                Description = request.Description,
-                Location = request.Location,
-                Capacity = request.Capacity,
-                PricePerNight = request.PricePerNight,
-                HostId = request.HostId 
-            };
+            var newProperty = Property.Create(
+                hostId: request.HostId,
+                title: request.Title,
+                description: request.Description,
+                location: request.Location,
+                capacity: request.Capacity,
+                pricePerNight: request.PricePerNight
+            );
 
             _propertyRepository.Add(newProperty);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
