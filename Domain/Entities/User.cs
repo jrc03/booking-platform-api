@@ -48,6 +48,15 @@ public class User
         return Role.HasFlag(role);
     }
 
+    public void UpdateProfile(string firstName, string lastName)
+    {
+        if (string.IsNullOrWhiteSpace(firstName)) throw new ArgumentException("First name cannot be empty", nameof(firstName));
+        if (string.IsNullOrWhiteSpace(lastName)) throw new ArgumentException("Last name cannot be empty", nameof(lastName));
+
+        FirstName = firstName;
+        LastName = lastName;
+    }
+
     // Email Confirmation State
     public bool IsEmailConfirmed { get; private set; }
     public string? ConfirmationToken { get; private set; }
