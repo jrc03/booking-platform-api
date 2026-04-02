@@ -9,14 +9,14 @@ namespace Domain.Entities
     {
         public Review() { }
 
-        public  Guid Id { get; init; } = Guid.NewGuid();
-        public required Guid BookingId { get; init; }
-        public required Guid GuestId { get; init; }
-        public required Guid PropertyId { get; init; }
+        public Guid Id { get; private set; } = Guid.NewGuid();
+        public Guid BookingId { get; private set; }
+        public Guid GuestId { get; private set; }
+        public Guid PropertyId { get; private set; }
 
-        public required int Rating { get; init; }
-        public required string Comment { get; init; }
-        public  DateTime CreatedAt { get; init; } = DateTime.UtcNow;
+        public int Rating { get; private set; }
+        public string Comment { get; private set; } = string.Empty;
+        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
         public static Review Create(Guid bookingId, Guid guestId, Guid propertyId, int rating, string comment)
         {
@@ -34,6 +34,18 @@ namespace Domain.Entities
                 Rating = rating,
                 Comment = comment,   
             };
+        }
+
+        public void UpdateReview(int rating, string comment)
+        {
+            if (rating < 1 || rating > 5)
+                throw new ArgumentException("Rating must be between 1 and 5.", nameof(rating));
+
+            if (string.IsNullOrWhiteSpace(comment))
+                throw new ArgumentException("Comment cannot be empty.", nameof(comment));
+
+            Rating = rating;
+            Comment = comment;
         }
 
     }

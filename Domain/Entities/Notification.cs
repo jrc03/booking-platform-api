@@ -9,13 +9,13 @@ namespace Domain.Entities
     {
         public Notification() { }
 
-        public Guid Id { get; init; } = Guid.NewGuid();
-        public required Guid UserId { get; init; }
-        public required string Message { get; init; }
+        public Guid Id { get; private set; } = Guid.NewGuid();
+        public Guid UserId { get; private set; }
+        public string Message { get; private set; } = string.Empty;
 
         public bool IsRead { get; private set; } = false;
 
-        public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
         public static Notification Create(Guid userId, string message)
         {
