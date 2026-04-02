@@ -31,7 +31,7 @@ namespace Application.Features.Bookings.Commands
             property.BlockDateRange(requestedDates);
 
             var totalNights = (int)(request.EndDate - request.StartDate).TotalDays;
-            var totalPrice = totalNights * property.PricePerNight;
+            // var totalPrice = totalNights * property.PricePerNight;
 
             var newBooking = Booking.Create(
                 request.PropertyId,

@@ -3,6 +3,7 @@ using MediatR;
 using Domain.Enums;
 using Domain.Entities;
 using Application.Features.Users.DTOs;
+using Application.Interfaces.Auth;
 
 namespace Application.Features.Users.Commands
 {
@@ -10,22 +11,23 @@ namespace Application.Features.Users.Commands
     {
         private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public RegisterUserCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork)
+        public RegisterUserCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork, IPasswordHasher passwordHasher)
         {
             _userRepository = userRepository;
             _unitOfWork = unitOfWork;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<UserResponseDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
 
-            //TODO FLuent validation
             var newUser = User.Create(
                 request.FirstName,
                 request.LastName,
                 request.Email,
-                request.Password
+                _passwordHasher.HashPassword(request.Password)
             );
 
             if (request.IsHost)
@@ -36,7 +38,7 @@ namespace Application.Features.Users.Commands
             _userRepository.Add(newUser);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-          
+
             return new UserResponseDto(
                 newUser.Id,
                 newUser.FirstName,
