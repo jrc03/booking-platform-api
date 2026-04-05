@@ -27,10 +27,15 @@ public class PropertyConfig : IEntityTypeConfiguration<Property>
             bd.Property(r => r.End).HasColumnName("EndDate").IsRequired();
             
             bd.WithOwner().HasForeignKey("PropertyId");
-            bd.HasKey("PropertyId", "StartDate", "EndDate"); 
+            bd.HasKey("PropertyId", "Start", "End"); // Use CLR property names for the key
         });
 
         builder.Metadata.FindNavigation(nameof(Property.BlockedDates))!
                .SetPropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.Property(p => p.ImageUrls)
+               .HasField("_imageUrls")
+               .UsePropertyAccessMode(PropertyAccessMode.Field);
+
     }
 }

@@ -45,8 +45,21 @@ namespace Domain.Entities
 
 
         private readonly List<DateRange> _blockedDates = new();
-
         public IReadOnlyCollection<DateRange> BlockedDates => _blockedDates.AsReadOnly();
+
+        private readonly List<string> _imageUrls = new();
+        public IReadOnlyCollection<string> ImageUrls => _imageUrls.AsReadOnly();
+
+        public void AddImage(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url)) throw new ArgumentException("Image URL cannot be empty");
+            _imageUrls.Add(url);
+        }
+
+        public void RemoveImage(string url)
+        {
+            _imageUrls.Remove(url);
+        }
 
 
         public byte[] RowVersion { get; private set; } = Array.Empty<byte>();

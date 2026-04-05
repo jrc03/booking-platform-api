@@ -18,7 +18,6 @@ namespace Infrastructure.Persistence.Context
         {
             base.OnModelCreating(modelBuilder);
 
-
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         }
     }
