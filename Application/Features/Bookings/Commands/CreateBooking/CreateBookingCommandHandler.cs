@@ -27,11 +27,13 @@ namespace Application.Features.Bookings.Commands
         {
             var property = await _propertyRepository.GetByIdAsync(request.PropertyId) ?? throw new Exception("Property not found");
 
+            if (property.HostId == request.GuestId)
+                throw new InvalidOperationException("Cannot book your own property");
+
             var requestedDates = new DateRange(request.StartDate, request.EndDate);
             property.BlockDateRange(requestedDates);
 
-            var totalNights = (int)(request.EndDate - request.StartDate).TotalDays;
-            // var totalPrice = totalNights * property.PricePerNight;
+
 
             var newBooking = Booking.Create(
                 request.PropertyId,

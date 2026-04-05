@@ -26,7 +26,10 @@ namespace Application.Features.Users.Queries.LoginUser
 
         public async Task<AuthenticationResponseDto> Handle(LoginUserQuery request, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.GetByEmailAsync(request.Email) ?? throw new Exception("User not found");
+            var user = await _userRepository.GetByEmailAsync(request.Email) ?? throw new Exception("Invalid Credentials");
+
+            if (!user.IsEmailConfirmed)
+                throw new UnauthorizedAccessException("Email not confirmed");
 
             if (!_passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
                 throw new InvalidCredentialException("Invalid Credentials");

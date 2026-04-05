@@ -13,16 +13,25 @@ namespace Application.Features.Reviews.Commands.CreateReview
     {
 
         private readonly IReviewRepository _reviewRepository;
+        private readonly IBookingRepository _bookingRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public CreateReviewCommandHandler(IReviewRepository reviewRepository, IUnitOfWork unitOfWork)
+        public CreateReviewCommandHandler(IReviewRepository reviewRepository, IBookingRepository bookingRepository, IUnitOfWork unitOfWork)
         {
             _reviewRepository = reviewRepository;
+            _bookingRepository = bookingRepository;
             _unitOfWork = unitOfWork;
         }
 
         public async Task<ReviewResponseDto> Handle(CreateReviewCommand request, CancellationToken cancellationToken)
         {
+            var booking = await _bookingRepository.GetByIdAsync(request.BookingId) ?? throw new ArgumentException("Booking not found.");
+           
+            if (booking.GuestId != request.GuestId)
+                throw new UnauthorizedAccessException("You are not the guest of this booking.");
+            if (booking.Status != Domain.Enums.BookingStatus.Completed)
+                throw new InvalidOperationException("You can only review a property after the booking is completed.");
+
             var newReview = Review.Create(
                 bookingId: request.BookingId,
                 guestId: request.GuestId,
