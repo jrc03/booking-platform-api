@@ -7,7 +7,7 @@ using Domain.Interfaces;
 using MediatR;
 using Application.Features.Properties.DTOs;
 
-namespace Application.Features.Properties.Commands
+namespace Application.Features.Properties.Commands.CreateProperty
 {
     public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyCommand, PropertyResponseDto>
     {

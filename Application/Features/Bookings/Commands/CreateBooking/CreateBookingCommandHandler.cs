@@ -8,7 +8,7 @@ using Domain.Interfaces;
 using Domain.ValueObjects;
 using MediatR;
 
-namespace Application.Features.Bookings.Commands
+namespace Application.Features.Bookings.Commands.CreateBooking
 {
     public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand, BookingResponseDto>
     {

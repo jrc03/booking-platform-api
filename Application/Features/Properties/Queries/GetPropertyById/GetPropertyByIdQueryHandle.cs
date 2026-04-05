@@ -6,7 +6,7 @@ using Application.Features.Properties.DTOs;
 using Domain.Interfaces;
 using MediatR;
 
-namespace Application.Features.Properties.Queries
+namespace Application.Features.Properties.Queries.GetPropertyById
 {
     public class GetPropertyByIdQueryHandle : IRequestHandler<GetPropertyByIdQuery, PropertyResponseDto>
     {
@@ -20,7 +20,7 @@ namespace Application.Features.Properties.Queries
         public async Task<PropertyResponseDto> Handle(GetPropertyByIdQuery request, CancellationToken cancellationToken)
         {
             var property = await _propertyRepository.GetByIdAsync(request.Id) ?? throw new Exception("Property not found");
-            
+
             return new PropertyResponseDto(
                 property.Id,
                 property.Title,

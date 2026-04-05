@@ -11,7 +11,7 @@ namespace Application.Features.Users.Commands
         string FirstName,
         string LastName,
         string Email,
-        string Password, // TODO Lo ideal luego es hacer un hash a la DB
-        bool IsHost
+        string Password, 
+        bool IsHost = false
         ) : IRequest<UserResponseDto>;
 }
