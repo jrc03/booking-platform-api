@@ -15,40 +15,50 @@ namespace Infrastructure.Persistence.Repositories
         public PropertyRepository(ApplicationDbContext dbContext) : base(dbContext)
         {
         }
-
-        public async Task<IEnumerable<Property>> GetAvailablePropertiesAsync(string location, DateTime start, DateTime end, int capacity)
+        public async Task<IEnumerable<Property>> SearchAsync(string? location, DateTime? startDate, DateTime? endDate, int? minCapacity, decimal? maxPrice, int pageNumber, int pageSize)
         {
-           
             var query = _dbSet.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(location))
                 query = query.Where(p => p.Location.Contains(location));
-            
 
-            var properties = await query
-                .Where(p => p.Capacity >= capacity)
-                .ToListAsync();
+            if (minCapacity.HasValue)
+                query = query.Where(p => p.Capacity >= minCapacity.Value);
+
+            if (maxPrice.HasValue)
+                query = query.Where(p => p.PricePerNight <= maxPrice.Value);
+
+            var properties = await query.ToListAsync();
 
             if (properties.Count == 0)
-                return properties;
+                return new List<Property>();
 
-            var propertyIds = properties.Select(p => p.Id).ToList();
-            
-            var conflictingBookings = await _dbContext.Bookings
-                .Where(b => propertyIds.Contains(b.PropertyId) && 
-                            b.Status == BookingStatus.Confirmed &&
-                            b.Dates.Start < end && start < b.Dates.End)
-                .Select(b => b.PropertyId)
-                .ToListAsync();
+            if (startDate.HasValue && endDate.HasValue)
+            {
+                var start = startDate.Value;
+                var end = endDate.Value;
 
-            var conflictingPropertyIds = conflictingBookings.ToHashSet();
+                var propertyIds = properties.Select(p => p.Id).ToList();
 
-            var availableProperties = properties.Where(p => 
-                !conflictingPropertyIds.Contains(p.Id) &&
-                !p.BlockedDates.Any(b => b.Start < end && start < b.End)
-            ).ToList();
+                var conflictingBookings = await _dbContext.Bookings
+                    .Where(b => propertyIds.Contains(b.PropertyId) &&
+                                b.Status == BookingStatus.Confirmed &&
+                                b.Dates.Start < end && start < b.Dates.End)
+                    .Select(b => b.PropertyId)
+                    .ToListAsync();
 
-            return availableProperties;
+                var conflictingPropertyIds = conflictingBookings.ToHashSet();
+
+                properties = properties.Where(p =>
+                    !conflictingPropertyIds.Contains(p.Id) &&
+                    !p.BlockedDates.Any(b => b.Start < end && start < b.End)
+                ).ToList();
+            }
+
+            return properties
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
         }
     }
 }
