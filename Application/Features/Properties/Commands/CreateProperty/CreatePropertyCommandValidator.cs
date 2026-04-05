@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Application.Features.Properties.Commands
+namespace Application.Features.Properties.Commands.CreateProperty
 {
     public class CreatePropertyCommandValidator : AbstractValidator<CreatePropertyCommand>
     {
