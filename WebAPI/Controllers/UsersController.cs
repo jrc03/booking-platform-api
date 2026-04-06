@@ -36,8 +36,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("confirm-email")]
-        public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmEmailCommand command)
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token)
         {
+            var command = new ConfirmEmailCommand(email, token);
             await _sender.Send(command);
             return Ok(new { message = "Email confirmed successfully. You can now log in" });
         }
