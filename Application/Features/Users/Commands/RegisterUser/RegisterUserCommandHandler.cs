@@ -4,6 +4,8 @@ using Domain.Enums;
 using Domain.Entities;
 using Application.Features.Users.DTOs;
 using Application.Interfaces.Auth;
+using Application.Interfaces.Email;
+using Application.Features.Users.Events;
 
 namespace Application.Features.Users.Commands
 {
@@ -12,12 +14,18 @@ namespace Application.Features.Users.Commands
         private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IPublisher _publisher;
 
-        public RegisterUserCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork, IPasswordHasher passwordHasher)
+        public RegisterUserCommandHandler(
+            IUserRepository userRepository,
+            IUnitOfWork unitOfWork,
+            IPasswordHasher passwordHasher,
+            IPublisher publisher)
         {
             _userRepository = userRepository;
             _unitOfWork = unitOfWork;
             _passwordHasher = passwordHasher;
+            _publisher = publisher;
         }
 
         public async Task<UserResponseDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
@@ -37,6 +45,12 @@ namespace Application.Features.Users.Commands
 
             _userRepository.Add(newUser);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+           
+            await _publisher.Publish(new UserRegisteredEvent(
+                newUser.Id,
+                newUser.Email,
+                newUser.FirstName,
+                newUser.ConfirmationToken!), cancellationToken);
 
 
             return new UserResponseDto(
