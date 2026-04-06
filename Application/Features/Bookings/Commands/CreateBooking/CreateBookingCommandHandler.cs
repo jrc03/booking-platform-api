@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Features.Bookings.DTOs;
+using Application.Features.Bookings.Events;
 using Domain.Entities;
 using Domain.Interfaces;
 using Domain.ValueObjects;
@@ -15,12 +16,14 @@ namespace Application.Features.Bookings.Commands.CreateBooking
         private readonly IBookingRepository _bookingRepository;
         private readonly IPropertyRepository _propertyRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IPublisher _publisher;
 
-        public CreateBookingCommandHandler(IBookingRepository bookingRepository, IPropertyRepository propertyRepository, IUnitOfWork unitOfWork)
+        public CreateBookingCommandHandler(IBookingRepository bookingRepository, IPropertyRepository propertyRepository, IUnitOfWork unitOfWork, IPublisher publisher)
         {
             _bookingRepository = bookingRepository;
             _propertyRepository = propertyRepository;
             _unitOfWork = unitOfWork;
+            _publisher = publisher;
         }
 
         public async Task<BookingResponseDto> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
@@ -33,8 +36,6 @@ namespace Application.Features.Bookings.Commands.CreateBooking
             var requestedDates = new DateRange(request.StartDate, request.EndDate);
             property.BlockDateRange(requestedDates);
 
-
-
             var newBooking = Booking.Create(
                 request.PropertyId,
                 request.GuestId,
@@ -44,6 +45,13 @@ namespace Application.Features.Bookings.Commands.CreateBooking
 
             _bookingRepository.Add(newBooking);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            await _publisher.Publish(new BookingCreatedEvent(
+            newBooking.Id,
+            newBooking.PropertyId,
+            newBooking.GuestId,
+            newBooking.TotalPrice
+            ), cancellationToken);
 
             return new BookingResponseDto(
                 newBooking.Id,

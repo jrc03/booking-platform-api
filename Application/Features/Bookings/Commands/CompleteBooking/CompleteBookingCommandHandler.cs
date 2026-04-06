@@ -1,3 +1,4 @@
+using Application.Features.Bookings.Events;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
@@ -11,11 +12,13 @@ namespace Application.Features.Bookings.Commands.CompleteBooking
     {
         private readonly IGenericRepository<Booking> _bookingRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IPublisher _publisher;
 
-        public CompleteBookingCommandHandler(IGenericRepository<Booking> bookingRepository, IUnitOfWork unitOfWork)
+        public CompleteBookingCommandHandler(IGenericRepository<Booking> bookingRepository, IUnitOfWork unitOfWork, IPublisher publisher)
         {
             _bookingRepository = bookingRepository;
             _unitOfWork = unitOfWork;
+            _publisher = publisher;
         }
 
         public async Task<bool> Handle(CompleteBookingCommand request, CancellationToken cancellationToken)
@@ -33,6 +36,12 @@ namespace Application.Features.Bookings.Commands.CompleteBooking
 
             _bookingRepository.Update(booking);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            await _publisher.Publish(new BookingCompletedEvent(
+                booking.Id,
+                booking.PropertyId,
+                booking.GuestId
+            ), cancellationToken);
 
             return true;
         }
