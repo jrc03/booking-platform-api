@@ -30,6 +30,11 @@ namespace Application.Features.Users.Commands
 
         public async Task<UserResponseDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
+            var existingUser = await _userRepository.GetByEmailAsync(request.Email);
+            if (existingUser != null)
+            {
+                throw new InvalidOperationException("This email is already registered in the platform.");
+            }
 
             var newUser = User.Create(
                 request.FirstName,
