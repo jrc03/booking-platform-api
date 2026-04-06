@@ -1,8 +1,14 @@
 using Application;
+using Application.Settings;
 using Infrastructure;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Bind and Register ApiSettings
+var apiSettings = new ApiSettings();
+builder.Configuration.GetSection("ApiSettings").Bind(apiSettings);
+builder.Services.AddSingleton(apiSettings);
 
 // Add services to the container.
 builder.Services.AddControllers();
