@@ -6,6 +6,8 @@ using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Application.Interfaces.Email;
+using Infrastructure.Services.Email;
 
 
 namespace Infrastructure;
@@ -35,6 +37,10 @@ public static class DependencyInjection
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
+        // Configuración fuertemente tipada (Options Pattern) permitida en Infra
+        services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
+        // Registrar Servicio de Correos
+        services.AddScoped<IEmailService, MailKitEmailService>();
         return services;
     }
 }
