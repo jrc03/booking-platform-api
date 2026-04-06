@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Features.Users.Commands;
+using Application.Features.Users.Commands.ConfirmEmail;
 using Application.Features.Users.Queries.LoginUser;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -32,6 +33,13 @@ namespace WebAPI.Controllers
         {
             var result = await _sender.Send(query);
             return Ok(result);
+        }
+
+        [HttpGet("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmEmailCommand command)
+        {
+            await _sender.Send(command);
+            return Ok(new { message = "Email confirmed successfully. You can now log in" });
         }
     }
 }
