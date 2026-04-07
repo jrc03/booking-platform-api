@@ -6,6 +6,7 @@ using Application.Features.Properties.Queries.GetAllProperties;
 using Application.Features.Properties.Queries.GetPropertyById;
 using Application.Features.Properties.Queries.SearchProperties;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
@@ -30,7 +31,6 @@ public class PropertiesController : ControllerBase
     }
 
     // GET: api/properties
-    // Este endpoint ejecuta nuestro GetAllPropertiesQuery. Devuelve una lista de DTOs.
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -39,7 +39,6 @@ public class PropertiesController : ControllerBase
     }
 
     // GET: api/properties/{id}
-    // Extraemos el id (Guid) directo de la URL y construimos la consulta para buscarlo.
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -48,8 +47,7 @@ public class PropertiesController : ControllerBase
     }
 
     // POST: api/properties
-    // Cacha el JSON enviado por el host, lo valida automáticamente gracias al Pipeline de FluentValidation,
-    // y nos va a devolver un "201 Created" junto con los datos de la nueva propiedad.
+    [Authorize(Roles = "Host")]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreatePropertyCommand command)
     {
@@ -60,11 +58,10 @@ public class PropertiesController : ControllerBase
     }
 
     // PUT: api/properties/{id}
-    // Actualizamos propiedades. El ID viene en la URL y los demás datos por el body.
+    [Authorize(Roles = "Host")]
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdatePropertyCommand command)
     {
-        // Regla de seguridad simple: validar que no intenten hackear mandando un ID en la URL y otro en el Body
         if (id != command.Id)
             return BadRequest(new { error = "El ID de la URL y del body no coinciden." });
 
@@ -73,8 +70,7 @@ public class PropertiesController : ControllerBase
     }
 
     // DELETE: api/properties/{id}
-    // El endpoint de borrado. Enviamos la orden de eliminar. Al ser un proceso sin "respuesta" en formato JSON,
-    // devolver NoContent (Status 204) es el estándar de API REST mundial.
+    [Authorize(Roles = "Host")]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

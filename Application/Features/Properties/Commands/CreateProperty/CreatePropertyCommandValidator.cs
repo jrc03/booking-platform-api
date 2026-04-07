@@ -6,9 +6,6 @@ namespace Application.Features.Properties.Commands.CreateProperty
     {
         public CreatePropertyCommandValidator()
         {
-            RuleFor(x => x.HostId)
-                .NotEmpty().WithMessage("Host ID is required.");
-
             RuleFor(x => x.Title)
                 .NotEmpty().WithMessage("Title is required.")
                 .MinimumLength(5).WithMessage("Title must be at least 5 characters.")

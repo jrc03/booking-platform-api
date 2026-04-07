@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
 using Application.Features.Properties.DTOs;
+using Application.Interfaces.Auth;
 
 namespace Application.Features.Properties.Commands.CreateProperty
 {
@@ -13,17 +10,22 @@ namespace Application.Features.Properties.Commands.CreateProperty
     {
         private readonly IPropertyRepository _propertyRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentUserService _currentUserService;
 
-        public CreatePropertyCommandHandler(IPropertyRepository propertyRepository, IUnitOfWork unitOfWork)
+        public CreatePropertyCommandHandler(IPropertyRepository propertyRepository, IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
         {
             _propertyRepository = propertyRepository;
             _unitOfWork = unitOfWork;
+            _currentUserService = currentUserService;
         }
 
         public async Task<PropertyResponseDto> Handle(CreatePropertyCommand request, CancellationToken cancellationToken)
         {
+            var hostId = _currentUserService.UserId
+             ?? throw new UnauthorizedAccessException("Usuario no válido en el token.");
+
             var newProperty = Property.Create(
-                hostId: request.HostId,
+                hostId: hostId,
                 title: request.Title,
                 description: request.Description,
                 location: request.Location,
