@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Application.Features.Users.Commands;
 using Application.Features.Users.Commands.ConfirmEmail;
+using Application.Features.Users.Commands.ResendConfirmationEmail;
 using Application.Features.Users.Queries.LoginUser;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,13 @@ namespace WebAPI.Controllers
             var command = new ConfirmEmailCommand(email, token);
             await _sender.Send(command);
             return Ok(new { message = "Email confirmed successfully. You can now log in" });
+        }
+
+        [HttpPost("resend-confirmation")]
+        public async Task<IActionResult> ResendConfirmation([FromBody] ResendConfirmationEmailCommand command)
+        {
+            await _sender.Send(command);
+            return Ok(new { message = "If your email is registered and unconfirmed, a new confirmation link has been sent." });
         }
     }
 }
