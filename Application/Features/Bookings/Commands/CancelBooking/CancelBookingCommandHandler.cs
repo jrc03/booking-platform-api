@@ -5,6 +5,7 @@ using MediatR;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Interfaces.Auth;
 
 namespace Application.Features.Bookings.Commands.CancelBooking
 {
@@ -13,19 +14,23 @@ namespace Application.Features.Bookings.Commands.CancelBooking
         private readonly IGenericRepository<Booking> _bookingRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPublisher _publisher;
+        private readonly ICurrentUserService _currentUserService;
 
-        public CancelBookingCommandHandler(IGenericRepository<Booking> bookingRepository, IUnitOfWork unitOfWork, IPublisher publisher)
+        public CancelBookingCommandHandler(IGenericRepository<Booking> bookingRepository, IUnitOfWork unitOfWork, IPublisher publisher, ICurrentUserService currentUserService)
         {
             _bookingRepository = bookingRepository;
             _unitOfWork = unitOfWork;
             _publisher = publisher;
+            _currentUserService = currentUserService;
         }
 
         public async Task<bool> Handle(CancelBookingCommand request, CancellationToken cancellationToken)
         {
             var booking = await _bookingRepository.GetByIdAsync(request.BookingId) ?? throw new Exception($"Booking with ID {request.BookingId} not found.");
 
-            if (booking.GuestId != request.GuestId)
+            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Usuario no válido.");
+
+            if (booking.GuestId != guestId)
                 throw new UnauthorizedAccessException("You are not authorized to cancel this booking.");
 
             booking.Cancel();

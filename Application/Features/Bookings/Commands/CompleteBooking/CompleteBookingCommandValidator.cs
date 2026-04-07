@@ -8,9 +8,6 @@ namespace Application.Features.Bookings.Commands.CompleteBooking
         {
             RuleFor(x => x.BookingId)
                 .NotEmpty().WithMessage("Booking ID is required.");
-
-            RuleFor(x => x.GuestId)
-                .NotEmpty().WithMessage("Guest ID is required.");
         }
     }
 }

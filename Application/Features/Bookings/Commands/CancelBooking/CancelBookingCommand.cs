@@ -7,5 +7,5 @@ using MediatR;
 
 namespace Application.Features.Bookings.Commands.CancelBooking
 {
-    public record CancelBookingCommand(Guid BookingId, Guid GuestId) : IRequest<bool>;
+    public record CancelBookingCommand(Guid BookingId) : IRequest<bool>;
 }

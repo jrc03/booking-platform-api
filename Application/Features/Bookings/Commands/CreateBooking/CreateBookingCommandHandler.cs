@@ -8,6 +8,7 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Domain.ValueObjects;
 using MediatR;
+using Application.Interfaces.Auth;
 
 namespace Application.Features.Bookings.Commands.CreateBooking
 {
@@ -17,20 +18,24 @@ namespace Application.Features.Bookings.Commands.CreateBooking
         private readonly IPropertyRepository _propertyRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPublisher _publisher;
+        private readonly ICurrentUserService _currentUserService;
 
-        public CreateBookingCommandHandler(IBookingRepository bookingRepository, IPropertyRepository propertyRepository, IUnitOfWork unitOfWork, IPublisher publisher)
+        public CreateBookingCommandHandler(IBookingRepository bookingRepository, IPropertyRepository propertyRepository, IUnitOfWork unitOfWork, IPublisher publisher, ICurrentUserService currentUserService)
         {
             _bookingRepository = bookingRepository;
             _propertyRepository = propertyRepository;
             _unitOfWork = unitOfWork;
             _publisher = publisher;
+            _currentUserService = currentUserService;
         }
 
         public async Task<BookingResponseDto> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
         {
+            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Usuario no válido.");
+
             var property = await _propertyRepository.GetByIdAsync(request.PropertyId) ?? throw new Exception("Property not found");
 
-            if (property.HostId == request.GuestId)
+            if (property.HostId == guestId)
                 throw new InvalidOperationException("Cannot book your own property");
 
             var requestedDates = new DateRange(request.StartDate, request.EndDate);
@@ -38,7 +43,7 @@ namespace Application.Features.Bookings.Commands.CreateBooking
 
             var newBooking = Booking.Create(
                 request.PropertyId,
-                request.GuestId,
+                guestId,
                 requestedDates,
                 property.PricePerNight
             );

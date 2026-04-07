@@ -11,10 +11,6 @@ public class CreateBookingCommandValidator : AbstractValidator<CreateBookingComm
             .NotEmpty()
             .WithMessage("Property ID is required.");
 
-        RuleFor(x => x.GuestId)
-            .NotEmpty()
-            .WithMessage("Guest ID is required.");
-
         RuleFor(x => x.StartDate)
             .GreaterThanOrEqualTo(DateTime.UtcNow.Date)
             .WithMessage("Start Date cannot be in the past.");

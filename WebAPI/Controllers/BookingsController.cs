@@ -4,20 +4,25 @@ using Application.Features.Bookings.Commands.CreateBooking;
 using Application.Features.Bookings.Queries.GetAllBookings;
 using Application.Features.Bookings.Queries.GetBookingById;
 using Application.Features.Bookings.Queries.GetBookingsByGuest;
+using Application.Interfaces.Auth;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class BookingsController : ControllerBase
     {
         private readonly ISender _sender;
+        private readonly ICurrentUserService _currentUserService;
 
-        public BookingsController(ISender sender)
+        public BookingsController(ISender sender, ICurrentUserService currentUserService)
         {
             _sender = sender;
+            _currentUserService = currentUserService;
         }
 
         // GET: api/bookings
@@ -37,10 +42,11 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
-        // GET: api/bookings/guest/{guestId}
-        [HttpGet("guest/{guestId:guid}")]
-        public async Task<IActionResult> GetByGuestId(Guid guestId)
+        // GET: api/bookings/guest
+        [HttpGet("guest")]
+        public async Task<IActionResult> GetMyBookings()
         {
+            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Usuario no válido.");
             var result = await _sender.Send(new GetBookingsByGuestQuery(guestId));
             return Ok(result);
         }
@@ -54,7 +60,6 @@ namespace WebAPI.Controllers
         }
 
         // POST: api/bookings/{id}/cancel
-        // Mandato: El cambio de estado debe realizarse por acciones específicas, no PUT/PATCH genérico.
         [HttpPost("{id:guid}/cancel")]
         public async Task<IActionResult> Cancel(Guid id, [FromBody] CancelBookingCommand command)
         {
