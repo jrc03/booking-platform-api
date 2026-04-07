@@ -30,13 +30,16 @@ namespace Application.Features.Notifications.EventHandlers
             if (property == null) return; // Safety check
 
             // 2. Create the message text for the host
-            string message = $"You have a new confirmed booking for '{property.Title}'! Expected total earnings: ${notification.TotalPrice}";
+            string hostMessage = $"You have a new confirmed booking for '{property.Title}'! Expected total earnings: ${notification.TotalPrice}";
+            var hostNotification = Notification.Create(property.HostId, hostMessage);
 
-            // 3. Use the factory to create the notification, assigned to the property owner (HostId)
-            var newNotification = Notification.Create(property.HostId, message);
+            // Create the message text for the guest
+            string guestMessage = $"Your booking for '{property.Title}' has been successfully confirmed. Total price: ${notification.TotalPrice}";
+            var guestNotification = Notification.Create(notification.GuestId, guestMessage);
 
-            // 4. Save the new notification to the database
-            _notificationRepository.Add(newNotification);
+            // 4. Save both notifications to the database
+            _notificationRepository.Add(hostNotification);
+            _notificationRepository.Add(guestNotification);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
     }

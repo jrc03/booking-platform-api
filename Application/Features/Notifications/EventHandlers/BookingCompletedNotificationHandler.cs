@@ -31,8 +31,11 @@ namespace Application.Features.Notifications.EventHandlers
             string guestMessage = $"Hope you enjoyed your stay at '{property.Title}'! Don't forget to leave a review.";
             var guestNotification = Notification.Create(notification.GuestId, guestMessage);
 
-            // Save the notification to the database (Only Guest should be notified on completion)
+            string hostMessage = $"Your guest has successfully completed their stay at '{property.Title}'.";
+            var hostNotification = Notification.Create(property.HostId, hostMessage);
+
             _notificationRepository.Add(guestNotification);
+            _notificationRepository.Add(hostNotification);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
 
