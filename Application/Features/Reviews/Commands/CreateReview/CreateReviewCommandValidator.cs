@@ -9,9 +9,6 @@ namespace Application.Features.Reviews.Commands.CreateReview
             RuleFor(x => x.BookingId)
                 .NotEmpty().WithMessage("Booking ID is required.");
 
-            RuleFor(x => x.GuestId)
-                .NotEmpty().WithMessage("Guest ID is required.");
-
             RuleFor(x => x.PropertyId)
                 .NotEmpty().WithMessage("Property ID is required.");
 

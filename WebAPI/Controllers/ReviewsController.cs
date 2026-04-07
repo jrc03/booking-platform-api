@@ -3,6 +3,7 @@ using Application.Features.Reviews.Commands.DeleteReview;
 using Application.Features.Reviews.Commands.UpdateReview;
 using Application.Features.Reviews.Queries.GetReviewsByProperty;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
@@ -29,6 +30,7 @@ public class ReviewsController : ControllerBase
 
     // POST: api/reviews
     // Creates a new review for a completed booking.
+    [Authorize(Roles = "Guest")]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateReviewCommand command)
     {
@@ -38,6 +40,7 @@ public class ReviewsController : ControllerBase
 
     // PUT: api/reviews/{id}
     // Updates an existing review's rating and/or comment payload.
+    [Authorize(Roles = "Guest")]
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateReviewCommand command)
     {
@@ -48,12 +51,13 @@ public class ReviewsController : ControllerBase
         return Ok(result);
     }
 
-    // DELETE: api/reviews/{id}?guestId={guestId}
-    // Deletes a specific review. Requires guestId via query string for ownership authorization.
+    // DELETE: api/reviews/{id}
+    // Deletes a specific review. Ownership authorization uses JWT token directly.
+    [Authorize(Roles = "Guest")]
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id, [FromQuery] Guid guestId)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        await _sender.Send(new DeleteReviewCommand(id, guestId));
+        await _sender.Send(new DeleteReviewCommand(id));
         return NoContent(); // HTTP 204
     }
 }

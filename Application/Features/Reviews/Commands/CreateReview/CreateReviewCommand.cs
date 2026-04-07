@@ -10,7 +10,6 @@ namespace Application.Features.Reviews.Commands.CreateReview
     public record CreateReviewCommand
    (
         Guid BookingId,
-        Guid GuestId,
         Guid PropertyId,
         int Rating,
         string Comment

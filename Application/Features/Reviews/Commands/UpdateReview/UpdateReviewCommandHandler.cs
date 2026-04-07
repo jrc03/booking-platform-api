@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Application.Features.Reviews.DTOs;
 using Domain.Interfaces;
 using MediatR;
+using Application.Interfaces.Auth;
 
 namespace Application.Features.Reviews.Commands.UpdateReview
 {
@@ -12,15 +13,23 @@ namespace Application.Features.Reviews.Commands.UpdateReview
     {
         private readonly IReviewRepository _reviewRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentUserService _currentUserService;
 
-        public UpdateReviewCommandHandler(IReviewRepository reviewRepository, IUnitOfWork unitOfWork)
+        public UpdateReviewCommandHandler(IReviewRepository reviewRepository, IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
         {
             _reviewRepository = reviewRepository;
             _unitOfWork = unitOfWork;
+            _currentUserService = currentUserService;
         }
+
         public async Task<ReviewResponseDto> Handle(UpdateReviewCommand request, CancellationToken cancellationToken)
         {
             var review = await _reviewRepository.GetByIdAsync(request.Id) ?? throw new Exception("Review not found");
+
+            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Usuario no válido.");
+            
+            if (review.GuestId != guestId)
+                throw new UnauthorizedAccessException("You are not authorized to update this review.");
 
             review.UpdateReview(
                 request.Rating,
