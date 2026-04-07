@@ -46,6 +46,23 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"]!)),
         ClockSkew = TimeSpan.Zero
     };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnForbidden = context =>
+        {
+            context.Response.StatusCode = 403;
+            context.Response.ContentType = "application/json";
+            
+            var result = System.Text.Json.JsonSerializer.Serialize(new 
+            { 
+                error = "Forbidden", 
+                message = "You do not have the required permissions (Role) to perform this action. For example, creating a property requires the 'Host' role."
+            });
+            
+            return context.Response.WriteAsync(result);
+        }
+    };
 });
 
 // Add Authorization services
