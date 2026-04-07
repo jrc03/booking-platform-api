@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Features.Properties.DTOs;
+using Application.Interfaces.Auth;
 using Domain.Interfaces;
 using MediatR;
 
@@ -11,18 +12,23 @@ namespace Application.Features.Properties.Commands.UpdateProperty
     {
         private readonly IPropertyRepository _propertyRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentUserService _currentUserService;
 
-        public UpdatePropertyCommandHandler(IPropertyRepository propertyRepository, IUnitOfWork unitOfWork)
+        public UpdatePropertyCommandHandler(IPropertyRepository propertyRepository, IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
         {
             _propertyRepository = propertyRepository;
             _unitOfWork = unitOfWork;
+            _currentUserService = currentUserService;
         }
 
         public async Task<PropertyResponseDto> Handle(UpdatePropertyCommand request, CancellationToken cancellationToken)
         {
+            var hostId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("User not logged in.");
             var property = await _propertyRepository.GetByIdAsync(request.Id) ?? throw new Exception("Property not found");
 
-    
+            if (property.HostId != hostId) 
+                throw new UnauthorizedAccessException("You are not the owner of this property.");
+
             property.UpdateDetails(
                 request.Title,
                 request.Description,

@@ -17,7 +17,7 @@ namespace Application.Features.Bookings.Queries.GetBookingById
 
         public async Task<BookingResponseDto> Handle(GetBookingByIdQuery request, CancellationToken cancellationToken)
         {
-            // TODO: Usar custom Exceptions (ej. NotFoundException) en versiones avanzadas
+            // TODO: Use custom Exceptions (e.g. NotFoundException) in advanced versions
             var booking = await _bookingRepository.GetByIdAsync(request.BookingId) ?? throw new Exception($"Booking with ID {request.BookingId} not found");
             
             return new BookingResponseDto(

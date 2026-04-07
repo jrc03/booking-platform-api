@@ -22,7 +22,7 @@ namespace Application.Features.Properties.Commands.CreateProperty
         public async Task<PropertyResponseDto> Handle(CreatePropertyCommand request, CancellationToken cancellationToken)
         {
             var hostId = _currentUserService.UserId
-             ?? throw new UnauthorizedAccessException("Usuario no válido en el token.");
+             ?? throw new UnauthorizedAccessException("Invalid user.en el token.");
 
             var newProperty = Property.Create(
                 hostId: hostId,

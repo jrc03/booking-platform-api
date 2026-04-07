@@ -28,7 +28,7 @@ namespace Application.Features.Bookings.Commands.CancelBooking
         {
             var booking = await _bookingRepository.GetByIdAsync(request.BookingId) ?? throw new Exception($"Booking with ID {request.BookingId} not found.");
 
-            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Usuario no válido.");
+            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Invalid user.");
 
             if (booking.GuestId != guestId)
                 throw new UnauthorizedAccessException("You are not authorized to cancel this booking.");
@@ -48,3 +48,4 @@ namespace Application.Features.Bookings.Commands.CancelBooking
         }
     }
 }
+

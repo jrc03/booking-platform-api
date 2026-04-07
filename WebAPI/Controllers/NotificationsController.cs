@@ -25,7 +25,7 @@ public class NotificationsController : ControllerBase
     [HttpGet("unread")]
     public async Task<IActionResult> GetUnread()
     {
-        var userId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Usuario no válido.");
+        var userId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Invalid user.");
         var result = await _sender.Send(new GetUnreadNotificationsByUserQuery(userId));
         return Ok(result);
     }

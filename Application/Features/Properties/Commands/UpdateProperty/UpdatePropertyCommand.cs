@@ -5,7 +5,7 @@ using MediatR;
 namespace Application.Features.Properties.Commands.UpdateProperty
 {
     public record UpdatePropertyCommand(
-        Guid Id, // El ID de la propiedad a modificar
+        Guid Id, // The ID of the property to modify
         string Title,
         string Description,
         string Location,

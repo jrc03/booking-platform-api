@@ -25,7 +25,7 @@ namespace Application.Features.Reviews.Commands.DeleteReview
         {
             var review = await _reviewRepository.GetByIdAsync(request.ReviewId) ?? throw new Exception($"Review with ID {request.ReviewId} not found.");
 
-            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Usuario no válido.");
+            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Invalid user.");
             
             if (review.GuestId != guestId)
                 throw new UnauthorizedAccessException("You are not authorized to delete this review.");
@@ -37,3 +37,4 @@ namespace Application.Features.Reviews.Commands.DeleteReview
         }
     }
 }
+

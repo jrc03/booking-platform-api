@@ -26,7 +26,7 @@ namespace Application.Features.Reviews.Commands.UpdateReview
         {
             var review = await _reviewRepository.GetByIdAsync(request.Id) ?? throw new Exception("Review not found");
 
-            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Usuario no válido.");
+            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Invalid user.");
             
             if (review.GuestId != guestId)
                 throw new UnauthorizedAccessException("You are not authorized to update this review.");

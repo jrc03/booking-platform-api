@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using Domain.ValueObjects;
+using Domain.Enums;
+
 namespace Infrastructure.Persistence.Repositories
 {
     public class BookingRepository : GenericRepository<Booking>, IBookingRepository
@@ -20,6 +23,15 @@ namespace Infrastructure.Persistence.Repositories
             return await _dbSet
                 .Where(b => b.GuestId == guestId)
                 .ToListAsync();
+        }
+
+        public async Task<bool> HasOverlappingBookingsAsync(Guid propertyId, DateRange dates)
+        {
+            return await _dbSet.AnyAsync(b => 
+                b.PropertyId == propertyId &&
+                b.Status == BookingStatus.Confirmed &&
+                b.Dates.Start < dates.End && 
+                dates.Start < b.Dates.End);
         }
     }
 }

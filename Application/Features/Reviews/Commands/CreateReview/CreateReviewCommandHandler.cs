@@ -29,7 +29,7 @@ namespace Application.Features.Reviews.Commands.CreateReview
 
         public async Task<ReviewResponseDto> Handle(CreateReviewCommand request, CancellationToken cancellationToken)
         {
-            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Usuario no válido.");
+            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Invalid user.");
 
             var booking = await _bookingRepository.GetByIdAsync(request.BookingId) ?? throw new ArgumentException("Booking not found.");
            

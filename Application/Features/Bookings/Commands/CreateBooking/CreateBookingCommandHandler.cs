@@ -31,7 +31,7 @@ namespace Application.Features.Bookings.Commands.CreateBooking
 
         public async Task<BookingResponseDto> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
         {
-            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Usuario no válido.");
+            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Invalid user.");
 
             var property = await _propertyRepository.GetByIdAsync(request.PropertyId) ?? throw new Exception("Property not found");
 
@@ -39,7 +39,14 @@ namespace Application.Features.Bookings.Commands.CreateBooking
                 throw new InvalidOperationException("Cannot book your own property");
 
             var requestedDates = new DateRange(request.StartDate, request.EndDate);
-            property.BlockDateRange(requestedDates);
+
+            // Availability Rule 1 & 2: Manually Blocked Dates + Confirmed Bookings
+            if (property.BlockedDates.Any(b => b.Overlaps(requestedDates)))
+                throw new InvalidOperationException("The property is no longer available for the selected dates. (Blocked by Host)");
+
+            var isOccupied = await _bookingRepository.HasOverlappingBookingsAsync(property.Id, requestedDates);
+            if (isOccupied)
+                throw new InvalidOperationException("The property is no longer available for the selected dates.");
 
             var newBooking = Booking.Create(
                 request.PropertyId,
@@ -47,6 +54,10 @@ namespace Application.Features.Bookings.Commands.CreateBooking
                 requestedDates,
                 property.PricePerNight
             );
+
+            // Concurrency Token Trigger
+            property.RecordBooking();
+            _propertyRepository.Update(property);
 
             _bookingRepository.Add(newBooking);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

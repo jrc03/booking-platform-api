@@ -28,7 +28,7 @@ namespace Application.Features.Bookings.Commands.CompleteBooking
         {
             var booking = await _bookingRepository.GetByIdAsync(request.BookingId) ?? throw new Exception($"Booking with ID {request.BookingId} not found.");
 
-            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Usuario no válido.");
+            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Invalid user.");
 
             if (DateTime.UtcNow.Date <= booking.Dates.End.Date)
                 throw new InvalidOperationException("Booking can only be completed after the checkout date.");

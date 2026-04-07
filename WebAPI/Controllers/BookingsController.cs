@@ -46,7 +46,7 @@ namespace WebAPI.Controllers
         [HttpGet("guest")]
         public async Task<IActionResult> GetMyBookings()
         {
-            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Usuario no válido.");
+            var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Invalid user.");
             var result = await _sender.Send(new GetBookingsByGuestQuery(guestId));
             return Ok(result);
         }
