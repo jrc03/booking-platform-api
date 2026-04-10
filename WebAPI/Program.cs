@@ -90,6 +90,9 @@ builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+
+app.UseCors("AllowReactLocal");
+
 app.UseMiddleware<WebAPI.Middlewares.ExceptionHandlingMiddleware>();
 
 
@@ -106,8 +109,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseCors("AllowReactLocal");
 
 app.UseAuthentication();
 app.UseAuthorization();

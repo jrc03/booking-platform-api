@@ -56,6 +56,10 @@ namespace WebAPI.Middlewares
             {
                 await HandleExceptionAsync(httpContext, HttpStatusCode.BadRequest, ex.Message);
             }
+            catch (System.Security.Authentication.InvalidCredentialException ex)
+            {
+                await HandleExceptionAsync(httpContext, HttpStatusCode.Unauthorized, ex.Message);
+            }
             catch (UnauthorizedAccessException ex) // E.g., User doesn't own the property or email not confirmed
             {
                 await HandleExceptionAsync(httpContext, HttpStatusCode.Unauthorized, ex.Message);
