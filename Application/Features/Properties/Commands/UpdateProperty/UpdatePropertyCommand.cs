@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Application.Features.Properties.DTOs;
 using MediatR;
 
@@ -10,6 +11,7 @@ namespace Application.Features.Properties.Commands.UpdateProperty
         string Description,
         string Location,
         decimal PricePerNight,
-        int Capacity
+        int Capacity,
+        IEnumerable<string>? ImageUrls
     ) : IRequest<PropertyResponseDto>;
 }

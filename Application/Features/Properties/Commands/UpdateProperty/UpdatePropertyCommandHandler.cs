@@ -37,6 +37,11 @@ namespace Application.Features.Properties.Commands.UpdateProperty
                 request.Capacity
             );
 
+            if (request.ImageUrls != null)
+            {
+                property.UpdateImages(request.ImageUrls);
+            }
+
             _propertyRepository.Update(property);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -46,7 +51,8 @@ namespace Application.Features.Properties.Commands.UpdateProperty
                 property.Description,
                 property.Location,
                 property.Capacity,
-                property.PricePerNight
+                property.PricePerNight,
+                property.ImageUrls
             );
         }
     }

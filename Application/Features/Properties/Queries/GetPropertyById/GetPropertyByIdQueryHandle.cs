@@ -27,7 +27,8 @@ namespace Application.Features.Properties.Queries.GetPropertyById
                 property.Description,
                 property.Location,
                 property.Capacity,
-                property.PricePerNight
+                property.PricePerNight,
+                property.ImageUrls
             );
         }
     }

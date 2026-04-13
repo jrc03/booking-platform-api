@@ -33,6 +33,14 @@ namespace Application.Features.Properties.Commands.CreateProperty
                 pricePerNight: request.PricePerNight
             );
 
+            if (request.ImageUrls != null)
+            {
+                foreach (var url in request.ImageUrls)
+                {
+                    newProperty.AddImage(url);
+                }
+            }
+
             _propertyRepository.Add(newProperty);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -43,9 +51,9 @@ namespace Application.Features.Properties.Commands.CreateProperty
                newProperty.Description,
                newProperty.Location,
                newProperty.Capacity,
-               newProperty.PricePerNight
-               );
-
+               newProperty.PricePerNight,
+               newProperty.ImageUrls
+            );
 
         }
     }

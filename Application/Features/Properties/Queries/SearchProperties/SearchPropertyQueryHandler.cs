@@ -35,7 +35,8 @@ namespace Application.Features.Properties.Queries.SearchProperties
                 p.Description,
                 p.Location,
                 p.Capacity,
-                p.PricePerNight
+                p.PricePerNight,
+                p.ImageUrls
             ));
         }
     }

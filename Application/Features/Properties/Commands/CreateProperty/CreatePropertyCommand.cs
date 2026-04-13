@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using MediatR;
 using Application.Features.Properties.DTOs;
@@ -9,7 +10,8 @@ namespace Application.Features.Properties.Commands.CreateProperty
         string Description,
         string Location,
         decimal PricePerNight,
-        int Capacity
+        int Capacity,
+        IEnumerable<string>? ImageUrls
     ) : IRequest<PropertyResponseDto>;
 
 

@@ -27,7 +27,8 @@ namespace Application.Features.Properties.Queries.GetAllProperties
                 p.Description,
                 p.Location,
                 p.Capacity,
-                p.PricePerNight
+                p.PricePerNight,
+                p.ImageUrls
             )).ToList();
         }
     }

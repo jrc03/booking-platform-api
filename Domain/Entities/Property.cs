@@ -61,6 +61,21 @@ namespace Domain.Entities
             _imageUrls.Remove(url);
         }
 
+        public void UpdateImages(IEnumerable<string> urls)
+        {
+            _imageUrls.Clear();
+            if (urls != null)
+            {
+                foreach (var url in urls)
+                {
+                    if (!string.IsNullOrWhiteSpace(url))
+                    {
+                        _imageUrls.Add(url);
+                    }
+                }
+            }
+        }
+
 
         public byte[] RowVersion { get; private set; } = Array.Empty<byte>();
         public DateTime LastBookedAt { get; private set; } = DateTime.UtcNow;
