@@ -3,6 +3,7 @@ using Application.Features.Properties.Commands.CreateProperty;
 using Application.Features.Properties.Commands.DeleteProperty;
 using Application.Features.Properties.Commands.UpdateProperty;
 using Application.Features.Properties.Queries.GetAllProperties;
+using Application.Features.Properties.Queries.GetMyProperties;
 using Application.Features.Properties.Queries.GetPropertyById;
 using Application.Features.Properties.Queries.SearchProperties;
 using MediatR;
@@ -43,6 +44,15 @@ public class PropertiesController : ControllerBase
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _sender.Send(new GetPropertyByIdQuery(id));
+        return Ok(result);
+    }
+
+    // GET: api/properties/my
+    [Authorize(Roles = "Host")]
+    [HttpGet("my")]
+    public async Task<IActionResult> GetMyProperties()
+    {
+        var result = await _sender.Send(new GetMyPropertiesQuery());
         return Ok(result);
     }
 

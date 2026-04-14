@@ -15,6 +15,12 @@ namespace Infrastructure.Persistence.Repositories
         public PropertyRepository(ApplicationDbContext dbContext) : base(dbContext)
         {
         }
+
+        public async Task<IEnumerable<Property>> GetByHostIdAsync(Guid hostId)
+        {
+            return await _dbSet.Where(p => p.HostId == hostId).ToListAsync();
+        }
+
         public async Task<IEnumerable<Property>> SearchAsync(string? location, DateTime? startDate, DateTime? endDate, int? minCapacity, decimal? maxPrice, int pageNumber, int pageSize)
         {
             var query = _dbSet.AsQueryable();
