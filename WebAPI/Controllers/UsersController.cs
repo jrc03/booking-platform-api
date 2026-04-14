@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Application.Features.Users.Commands;
 using Application.Features.Users.Commands.ConfirmEmail;
-using Application.Features.Users.Commands.ResendConfirmationEmail;
+using Application.Features.Users.Commands.BecomeHost;
 using Application.Features.Users.Queries.LoginUser;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Application.Features.Users.Commands.ResendConfirmationEmail;
 
 namespace WebAPI.Controllers
 {
@@ -49,6 +51,14 @@ namespace WebAPI.Controllers
         {
             await _sender.Send(command);
             return Ok(new { message = "If your email is registered and unconfirmed, a new confirmation link has been sent." });
+        }
+
+        [Authorize]
+        [HttpPost("become-host")]
+        public async Task<IActionResult> BecomeHost()
+        {
+            var result = await _sender.Send(new BecomeHostCommand());
+            return Ok(new { message = "You are now a host! Please login again to refresh your permissions.", user = result });
         }
     }
 }

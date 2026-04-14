@@ -21,14 +21,8 @@ namespace Application.Features.Users.Commands.UpdateUser
 
         public async Task<UserResponseDto> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.GetByIdAsync(request.UserId);
+            var user = await _userRepository.GetByIdAsync(request.UserId) ?? throw new Exception($"User with ID {request.UserId} not found.");
 
-            if (user == null)
-            {
-                throw new Exception($"User with ID {request.UserId} not found.");
-            }
-
-            // Usamos el método de dominio encapsulado
             user.UpdateProfile(request.FirstName, request.LastName);
 
             _userRepository.Update(user);
