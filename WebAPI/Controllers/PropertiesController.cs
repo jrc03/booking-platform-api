@@ -2,6 +2,7 @@ using Application.Features.Properties;
 using Application.Features.Properties.Commands.CreateProperty;
 using Application.Features.Properties.Commands.DeleteProperty;
 using Application.Features.Properties.Commands.UpdateProperty;
+using Application.Features.Properties.Commands.BlockDates;
 using Application.Features.Properties.Queries.GetAllProperties;
 using Application.Features.Properties.Queries.GetMyProperties;
 using Application.Features.Properties.Queries.GetPropertyById;
@@ -87,4 +88,20 @@ public class PropertiesController : ControllerBase
         await _sender.Send(new DeletePropertyCommand(id));
         return NoContent();
     }
+
+    // POST: api/properties/{id}/block-dates
+    [Authorize(Roles = "Host")]
+    [HttpPost("{id:guid}/block-dates")]
+    public async Task<IActionResult> BlockDates(Guid id, [FromBody] BlockDatesRequest request)
+    {
+        var command = new BlockDatesCommand(id, request.StartDate, request.EndDate);
+        var result = await _sender.Send(command);
+        return Ok(new { Message = "Dates blocked successfully.", PropertyId = result });
+    }
+}
+
+public class BlockDatesRequest
+{
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
 }
