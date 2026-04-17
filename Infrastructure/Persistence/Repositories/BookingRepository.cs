@@ -25,6 +25,13 @@ namespace Infrastructure.Persistence.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Booking>> GetBookingsByPropertyAsync(Guid propertyId)
+        {
+            return await _dbSet
+                .Where(b => b.PropertyId == propertyId && b.Status == BookingStatus.Confirmed)
+                .ToListAsync();
+        }
+
         public async Task<bool> HasOverlappingBookingsAsync(Guid propertyId, DateRange dates)
         {
             return await _dbSet.AnyAsync(b => 

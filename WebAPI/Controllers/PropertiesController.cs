@@ -6,6 +6,7 @@ using Application.Features.Properties.Commands.BlockDates;
 using Application.Features.Properties.Queries.GetAllProperties;
 using Application.Features.Properties.Queries.GetMyProperties;
 using Application.Features.Properties.Queries.GetPropertyById;
+using Application.Features.Properties.Queries.GetUnavailableDates;
 using Application.Features.Properties.Queries.SearchProperties;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -45,6 +46,14 @@ public class PropertiesController : ControllerBase
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _sender.Send(new GetPropertyByIdQuery(id));
+        return Ok(result);
+    }
+
+    // GET: api/properties/{id}/unavailable-dates
+    [HttpGet("{id:guid}/unavailable-dates")]
+    public async Task<IActionResult> GetUnavailableDates(Guid id)
+    {
+        var result = await _sender.Send(new GetUnavailableDatesQuery(id));
         return Ok(result);
     }
 
