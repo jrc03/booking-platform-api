@@ -11,9 +11,6 @@ namespace Domain.ValueObjects
         public DateTime End { get; set; }
         public DateRange(DateTime start, DateTime end)
         {
-            if (start.Date < DateTime.UtcNow.Date)
-                throw new ArgumentException("Start Date cannot be in the past");
-
             if (start >= end)
                 throw new ArgumentException("End date must be after start  date");
 
