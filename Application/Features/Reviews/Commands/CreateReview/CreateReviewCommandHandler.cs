@@ -16,13 +16,15 @@ namespace Application.Features.Reviews.Commands.CreateReview
 
         private readonly IReviewRepository _reviewRepository;
         private readonly IBookingRepository _bookingRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICurrentUserService _currentUserService;
 
-        public CreateReviewCommandHandler(IReviewRepository reviewRepository, IBookingRepository bookingRepository, IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
+        public CreateReviewCommandHandler(IReviewRepository reviewRepository, IBookingRepository bookingRepository, IUserRepository userRepository, IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
         {
             _reviewRepository = reviewRepository;
             _bookingRepository = bookingRepository;
+            _userRepository = userRepository;
             _unitOfWork = unitOfWork;
             _currentUserService = currentUserService;
         }
@@ -49,11 +51,14 @@ namespace Application.Features.Reviews.Commands.CreateReview
             _reviewRepository.Add(newReview);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+            var guest = await _userRepository.GetByIdAsync(guestId);
+
             return new ReviewResponseDto
            (
             newReview.Id,
             newReview.BookingId,
             newReview.GuestId,
+            guest?.FirstName ?? "Guest",
             newReview.PropertyId,
             newReview.Rating,
             newReview.Comment,

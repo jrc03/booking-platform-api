@@ -12,12 +12,14 @@ namespace Application.Features.Reviews.Commands.UpdateReview
     public class UpdateReviewCommandHandler : IRequestHandler<UpdateReviewCommand, ReviewResponseDto>
     {
         private readonly IReviewRepository _reviewRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICurrentUserService _currentUserService;
 
-        public UpdateReviewCommandHandler(IReviewRepository reviewRepository, IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
+        public UpdateReviewCommandHandler(IReviewRepository reviewRepository, IUserRepository userRepository, IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
         {
             _reviewRepository = reviewRepository;
+            _userRepository = userRepository;
             _unitOfWork = unitOfWork;
             _currentUserService = currentUserService;
         }
@@ -39,11 +41,14 @@ namespace Application.Features.Reviews.Commands.UpdateReview
             _reviewRepository.Update(review);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                        var guest = await _userRepository.GetByIdAsync(guestId);
+
             return new ReviewResponseDto
           (
            review.Id,
            review.BookingId,
            review.GuestId,
+                     guest?.FirstName ?? "Guest",
            review.PropertyId,
            review.Rating,
            review.Comment,

@@ -10,6 +10,7 @@ namespace Application.Features.Reviews.DTOs
         Guid Id,
         Guid BookingId,
         Guid GuestId,
+        string GuestFirstName,
         Guid PropertyId,
         int Rating,
         string Comment,
