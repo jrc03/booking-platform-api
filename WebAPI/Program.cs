@@ -1,13 +1,17 @@
 using System.Text;
 using Application;
+using Application.Interfaces.Notifications;
 using Application.Settings;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
+using WebAPI.Hubs;
+using WebAPI.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +23,7 @@ builder.Services.AddSingleton(apiSettings);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 builder.Services.AddOpenApi(options =>
 {
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
@@ -61,6 +66,18 @@ builder.Services.AddAuthentication(options =>
 
     options.Events = new JwtBearerEvents
     {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/notifications"))
+            {
+                context.Token = accessToken;
+            }
+
+            return Task.CompletedTask;
+        },
         OnForbidden = context =>
         {
             context.Response.StatusCode = 403;
@@ -82,7 +99,9 @@ builder.Services.AddAuthorization();
 
 // Add HttpContextAccessor and CurrentUserService
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<Application.Interfaces.Auth.ICurrentUserService, WebAPI.Services.CurrentUserService>();
+builder.Services.AddScoped<Application.Interfaces.Auth.ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<INotificationRealtimePublisher, SignalRNotificationRealtimePublisher>();
+builder.Services.AddSingleton<IUserIdProvider, HubUserIdProvider>();
 
 // Registers MediatR, FluentValidation, etc.
 builder.Services.AddApplicationServices();
@@ -113,6 +132,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapHub<NotificationHub>("/hubs/notifications");
 app.MapControllers();
 
 app.Run();
