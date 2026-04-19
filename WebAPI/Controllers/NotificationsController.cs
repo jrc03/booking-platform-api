@@ -1,3 +1,4 @@
+using Application.Features.Notifications.Commands.MarkAllNotificationsAsRead;
 using Application.Features.Notifications.Commands.MarkNotificationAsRead;
 using Application.Features.Notifications.Queries.GetUnreadNotificationsByUser;
 using Application.Interfaces.Auth;
@@ -36,5 +37,13 @@ public class NotificationsController : ControllerBase
     {
         await _sender.Send(new MarkNotificationAsReadCommand(id));
         return NoContent(); // HTTP 204: No Content (successful update without body response)
+    }
+
+    [HttpPatch("read-all")]
+    public async Task<IActionResult> MarkAllAsRead()
+    {
+        var id = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Invalid user.");
+        await _sender.Send(new MarkAllNotificationsAsReadCommand(id));
+        return NoContent(); // HTTP 204
     }
 }

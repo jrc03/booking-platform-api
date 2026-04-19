@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Application.Features.Bookings.Events;
+using Application.Features.Notifications.DTOs;
+using Application.Interfaces.Notifications;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
@@ -13,12 +11,18 @@ namespace Application.Features.Notifications.EventHandlers
     {
         private readonly IPropertyRepository _propertyRepository;
         private readonly INotificationRepository _notificationRepository;
+        private readonly INotificationRealtimePublisher _notificationRealtimePublisher;
         private readonly IUnitOfWork _unitOfWork;
 
-        public BookingCreatedNotificationHandler(IPropertyRepository propertyRepository, INotificationRepository notificationRepository, IUnitOfWork unitOfWork)
+        public BookingCreatedNotificationHandler(
+            IPropertyRepository propertyRepository,
+            INotificationRepository notificationRepository,
+            INotificationRealtimePublisher notificationRealtimePublisher,
+            IUnitOfWork unitOfWork)
         {
             _propertyRepository = propertyRepository;
             _notificationRepository = notificationRepository;
+            _notificationRealtimePublisher = notificationRealtimePublisher;
             _unitOfWork = unitOfWork;
         }
 
@@ -41,6 +45,28 @@ namespace Application.Features.Notifications.EventHandlers
             _notificationRepository.Add(hostNotification);
             _notificationRepository.Add(guestNotification);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            await _notificationRealtimePublisher.PublishToUserAsync(
+                hostNotification.UserId,
+                new NotificationResponseDto(
+                    hostNotification.Id,
+                    hostNotification.UserId,
+                    hostNotification.Message,
+                    hostNotification.IsRead,
+                    hostNotification.CreatedAt
+                ),
+                cancellationToken);
+
+            await _notificationRealtimePublisher.PublishToUserAsync(
+                guestNotification.UserId,
+                new NotificationResponseDto(
+                    guestNotification.Id,
+                    guestNotification.UserId,
+                    guestNotification.Message,
+                    guestNotification.IsRead,
+                    guestNotification.CreatedAt
+                ),
+                cancellationToken);
         }
     }
 }
