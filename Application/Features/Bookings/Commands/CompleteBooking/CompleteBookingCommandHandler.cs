@@ -30,8 +30,8 @@ namespace Application.Features.Bookings.Commands.CompleteBooking
 
             var guestId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("Invalid user.");
 //TODO
-            // if (DateTime.UtcNow.Date <= booking.Dates.End.Date)
-            //     throw new InvalidOperationException("Booking can only be completed after the checkout date.");
+            if (DateTime.UtcNow.Date <= booking.Dates.End.Date)
+                throw new InvalidOperationException("Booking can only be completed after the checkout date.");
             if (booking.Status != Domain.Enums.BookingStatus.Confirmed)
                 throw new InvalidOperationException("Only confirmed bookings can be completed.");
             if (booking.GuestId != guestId)

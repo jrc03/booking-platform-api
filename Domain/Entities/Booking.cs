@@ -51,8 +51,8 @@ namespace Domain.Entities
             if (Status != BookingStatus.Confirmed)
                 throw new InvalidOperationException("Only confirmed bookings can be completed.");
             //TODO 
-            // if (DateTime.UtcNow.Date <= Dates.End.Date)
-            //     throw new InvalidOperationException("Booking can only be completed after the checkout date.");
+            if (DateTime.UtcNow.Date <= Dates.End.Date)
+                throw new InvalidOperationException("Booking can only be completed after the checkout date.");
 
             Status = BookingStatus.Completed;
         }
